@@ -1,0 +1,11 @@
+FROM alpine
+COPY pwdapp /pwdapp/
+WORKDIR /pwdapp
+RUN chmod +x /pwdapp/docker-entrypoint.sh && \
+    apk update && \
+    apk add openssh-keygen && \
+    mkdir /pwd && \
+    mkdir /etc/ssh
+VOLUME /pwd
+ENTRYPOINT [ "/pwdapp/docker-entrypoint.sh" ]
+CMD [ "pwd" ]

@@ -1,0 +1,45 @@
+version: '3.4'
+services:
+    haproxy:
+        container_name: haproxy
+        image: pwd-haproxy
+        build:
+          context: .
+          dockerfile: Dockerfile
+          target: pwd-haproxy
+        ports:
+            - "80:8080"
+
+    pwd:
+        # pwd daemon container always needs to be named this way
+        container_name: pwd
+        image: pwd-pwd
+        build:
+          context: .
+          dockerfile: Dockerfile
+          target: pwd-pwd
+        command: pwd
+        volumes:
+            # since this app creates networks and launches containers, we need to talk to docker daemon
+            - /var/run/docker.sock:/var/run/docker.sock
+            - sessions:/pwd
+    l2:
+        # l2 daemon container always needs to be named this way
+        container_name: l2
+        image: pwd-l2
+        build:
+          context: .
+          dockerfile: Dockerfile
+          target: pwd-l2
+        command: l2
+        volumes:
+            # since this app creates networks and launches containers, we need to talk to docker daemon
+            - /var/run/docker.sock:/var/run/docker.sock
+            - networks:/pwd
+        ports:
+            - "8022:22"
+            - "8053:53"
+            - "443:443"
+volumes:
+    sessions:
+    networks:
